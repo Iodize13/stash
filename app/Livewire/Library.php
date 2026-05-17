@@ -78,14 +78,14 @@ class Library extends Component
         $article = Article::findOrFail($id);
         $this->authorize('update', $article);
 
-        $article->update(['status' => ArticleStatus::Queued, 'error' => null]);
+        $article->requeue();
     }
 
     public function retryFailed(): void
     {
         $this->authorize('update', new Article);
 
-        Article::where('status', ArticleStatus::Failed)->update(['status' => ArticleStatus::Queued, 'error' => null]);
+        Article::where('status', ArticleStatus::Failed)->each(fn (Article $article) => $article->requeue());
     }
 
     public function toggleArchive(int $id): void

@@ -1,11 +1,15 @@
 <?php
 
 use App\Enums\ArticleStatus;
+use App\Jobs\FetchArticle;
 use App\Livewire\Library;
 use App\Models\Article;
 use App\Models\User;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
+
+beforeEach(fn () => Queue::fake());
 
 function libraryUser(?string $role): User
 {
@@ -52,6 +56,8 @@ it('lets an admin save a link as a queued article with normalized url and tags',
         ->status->toBe(ArticleStatus::Queued)
         ->tags->toBe(['systems', 'rust'])
         ->user_id->toBe($admin->id);
+
+    Queue::assertPushed(FetchArticle::class, fn (FetchArticle $job) => $job->article->is($article));
 });
 
 it('rejects a link already saved in another form', function () {
@@ -136,6 +142,7 @@ it('retries, archives and deletes as admin', function () {
 
     $test->call('retry', $failed->id);
     expect($failed->fresh())->status->toBe(ArticleStatus::Queued)->error->toBeNull();
+    Queue::assertPushed(FetchArticle::class, fn (FetchArticle $job) => $job->article->is($failed));
 
     $test->call('toggleArchive', $other->id);
     expect($other->fresh()->archived_at)->not->toBeNull();

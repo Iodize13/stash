@@ -3,14 +3,20 @@
 namespace App\Models;
 
 use App\Enums\ArticleStatus;
+use App\Jobs\FetchArticle;
+use App\Observers\ArticleObserver;
 use Database\Factories\ArticleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'url', 'url_hash', 'domain', 'title', 'excerpt', 'tags', 'status', 'error', 'word_count', 'fetched_at', 'read_at', 'archived_at'])]
+#[Fillable(['user_id', 'url', 'url_hash', 'domain', 'title', 'byline', 'excerpt', 'content_html', 'content_text', 'tags', 'status', 'error', 'word_count', 'fetched_at', 'read_at', 'archived_at'])]
+#[Hidden(['content_html', 'content_text'])]
+#[ObservedBy(ArticleObserver::class)]
 class Article extends Model
 {
     /** @use HasFactory<ArticleFactory> */
@@ -64,6 +70,16 @@ class Article extends Model
             ->orWhere('url', 'ilike', $like)
             ->orWhere('excerpt', 'ilike', $like)
             ->orWhereRaw('tags::text ilike ?', [$like]));
+    }
+
+    /**
+     * Put the link back in the fetch queue (manual retry or re-fetch).
+     */
+    public function requeue(): void
+    {
+        $this->update(['status' => ArticleStatus::Queued, 'error' => null]);
+
+        FetchArticle::dispatch($this)->afterCommit();
     }
 
     public function path(): string

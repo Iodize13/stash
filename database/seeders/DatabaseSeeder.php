@@ -36,12 +36,17 @@ class DatabaseSeeder extends Seeder
         }
     }
 
+    /**
+     * Sample data only: no fetch jobs are queued for these made-up links.
+     */
     private function seedArticles(User $owner): void
     {
-        Article::factory()->count(22)->for($owner)->create();
-        Article::factory()->count(6)->for($owner)->read()->archived()->create();
-        Article::factory()->count(3)->for($owner)->queued()->create();
-        Article::factory()->for($owner)->fetching()->create();
-        Article::factory()->for($owner)->failed()->create();
+        Article::withoutEvents(function () use ($owner) {
+            Article::factory()->count(22)->for($owner)->create();
+            Article::factory()->count(6)->for($owner)->read()->archived()->create();
+            Article::factory()->count(3)->for($owner)->queued()->create();
+            Article::factory()->for($owner)->fetching()->create();
+            Article::factory()->for($owner)->failed()->create();
+        });
     }
 }
