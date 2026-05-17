@@ -1,9 +1,50 @@
 @import 'tailwindcss';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/jetbrains-mono/latin-400.css';
+@import '@fontsource/jetbrains-mono/latin-500.css';
+@import '@fontsource/jetbrains-mono/latin-700.css';
+@import '@fontsource/material-icons/latin-400.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --color-canvas: #0a0e13;
+    --color-rail: #101419;
+    --color-panel: #13171e;
+    --color-raised: #171c25;
+    --color-line: #1e2430;
+    --color-edge: #6b7280;
+    --color-accent: #58c4dd;
+    --color-hot: #ffafd3;
+    --color-ok: #6ee7b7;
+    --color-fg: #f1f5f9;
+    --color-muted: #94a3b8;
+    --color-dim: #64748b;
+}
+
+@layer base {
+    body {
+        @apply bg-canvas font-mono text-fg antialiased;
+    }
+}
+
+/* Material Icons are ligature based: the element text is the icon name. */
+.icon {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }

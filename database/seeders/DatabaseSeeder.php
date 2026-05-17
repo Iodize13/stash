@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Article;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -28,6 +29,19 @@ class DatabaseSeeder extends Seeder
             );
 
             $user->syncRoles(Role::findOrCreate($role));
+
+            if ($role === 'admin' && ! $user->articles()->exists()) {
+                $this->seedArticles($user);
+            }
         }
+    }
+
+    private function seedArticles(User $owner): void
+    {
+        Article::factory()->count(22)->for($owner)->create();
+        Article::factory()->count(6)->for($owner)->read()->archived()->create();
+        Article::factory()->count(3)->for($owner)->queued()->create();
+        Article::factory()->for($owner)->fetching()->create();
+        Article::factory()->for($owner)->failed()->create();
     }
 }
