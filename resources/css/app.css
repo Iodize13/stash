@@ -48,3 +48,66 @@
     font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
 }
+
+/* Reader: typography for sanitized article markup (no typography plugin). */
+.reader-body {
+    @apply leading-relaxed text-fg/90;
+}
+.reader-body > * + * {
+    @apply mt-5;
+}
+.reader-body :is(h1, h2, h3, h4, h5, h6) {
+    @apply mt-10 font-sans font-semibold leading-snug text-fg;
+}
+.reader-body h1 { font-size: 1.6em; }
+.reader-body h2 { font-size: 1.35em; }
+.reader-body h3 { font-size: 1.15em; }
+.reader-body a {
+    @apply text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent;
+}
+.reader-body :is(ul, ol) {
+    @apply space-y-2 pl-6;
+}
+.reader-body ul { list-style: disc; }
+.reader-body ol { list-style: decimal; }
+.reader-body blockquote {
+    @apply border-l-2 border-accent bg-panel px-6 py-4 italic text-muted;
+}
+.reader-body :is(pre) {
+    @apply overflow-x-auto bg-panel p-4 font-mono leading-normal;
+    font-size: 0.8em;
+}
+.reader-body :not(pre) > code {
+    @apply bg-panel px-1 font-mono;
+    font-size: 0.85em;
+}
+.reader-body img {
+    @apply mx-auto h-auto max-w-full;
+}
+.reader-body figcaption {
+    @apply mt-2 text-center text-sm text-dim;
+}
+.reader-body table {
+    @apply block overflow-x-auto text-sm;
+}
+.reader-body :is(td, th) {
+    @apply border border-line px-3 py-1.5;
+}
+.reader-body hr {
+    @apply border-line;
+}
+
+mark.hl {
+    @apply cursor-pointer text-inherit;
+    padding: 0.05em 0;
+}
+mark.hl-cyan { background: color-mix(in srgb, var(--color-accent) 28%, transparent); }
+mark.hl-pink { background: color-mix(in srgb, var(--color-hot) 30%, transparent); }
+mark.hl-green { background: color-mix(in srgb, var(--color-ok) 26%, transparent); }
+mark.hl-amber { background: color-mix(in srgb, #fbbf24 30%, transparent); }
+mark.hl-flash {
+    outline: 2px solid var(--color-fg);
+    outline-offset: 2px;
+}
+
+[x-cloak] { display: none !important; }

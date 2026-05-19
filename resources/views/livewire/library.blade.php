@@ -208,14 +208,22 @@
                                     @foreach ($article->tags as $tag)
                                         <span class="bg-canvas px-2 py-0.5 text-hot">#{{ $tag }}</span>
                                     @endforeach
+                                    @if ($article->highlights_count)
+                                        <span class="text-[11px] text-dim">{{ $article->highlights_count }} {{ Str::plural('highlight', $article->highlights_count) }}</span>
+                                    @endif
                                 </div>
+                            @elseif ($article->highlights_count)
+                                <span class="text-[11px] text-dim">{{ $article->highlights_count }} {{ Str::plural('highlight', $article->highlights_count) }}</span>
                             @endif
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2" x-data="{ copied: false }">
-                        <a href="{{ $article->url }}" target="_blank" rel="noopener noreferrer" class="flex h-8 items-center gap-1.5 bg-accent px-4 text-xs font-bold text-canvas hover:brightness-110">
-                            <x-material-icon name="open_in_new" class="text-[16px]" /> OPEN
+                        <a href="{{ route('articles.show', $article) }}" wire:navigate class="flex h-8 items-center gap-1.5 bg-accent px-4 text-xs font-bold text-canvas hover:brightness-110">
+                            <x-material-icon name="chrome_reader_mode" class="text-[16px]" /> READ
+                        </a>
+                        <a href="{{ $article->url }}" target="_blank" rel="noopener noreferrer" title="Open original" aria-label="Open original" class="flex size-9 items-center justify-center bg-canvas text-muted hover:text-fg">
+                            <x-material-icon name="open_in_new" class="text-[17px]" />
                         </a>
                         <button
                             type="button"

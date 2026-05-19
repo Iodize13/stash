@@ -145,7 +145,7 @@ class Library extends Component
     /** @return Builder<Article> */
     private function filteredQuery()
     {
-        $query = Article::query();
+        $query = Article::query()->withCount('highlights');
 
         match ($this->tab) {
             'unread' => $query->unread(),

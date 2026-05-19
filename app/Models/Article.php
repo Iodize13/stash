@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['user_id', 'url', 'url_hash', 'domain', 'title', 'byline', 'excerpt', 'content_html', 'content_text', 'tags', 'status', 'error', 'word_count', 'fetched_at', 'read_at', 'archived_at'])]
 #[Hidden(['content_html', 'content_text'])]
@@ -40,6 +41,12 @@ class Article extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** @return HasMany<Highlight, $this> */
+    public function highlights(): HasMany
+    {
+        return $this->hasMany(Highlight::class);
     }
 
     /** @param Builder<Article> $query */

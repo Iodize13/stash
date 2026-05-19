@@ -30,8 +30,8 @@
                             href="{{ route('library') }}"
                             @class([
                                 'flex items-center gap-3 border-l-2 px-3 py-2',
-                                'border-accent bg-raised font-medium text-accent' => request()->routeIs('library'),
-                                'border-transparent text-muted hover:text-fg' => ! request()->routeIs('library'),
+                                'border-accent bg-raised font-medium text-accent' => request()->routeIs('library', 'articles.show'),
+                                'border-transparent text-muted hover:text-fg' => ! request()->routeIs('library', 'articles.show'),
                             ])
                         >
                             <x-material-icon name="auto_stories" class="text-[18px]" />

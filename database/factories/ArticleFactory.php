@@ -14,6 +14,7 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         $url = 'https://'.fake()->domainName().'/'.fake()->slug(3);
+        [$html, $text] = $this->content();
 
         return [
             'user_id' => User::factory(),
@@ -24,14 +25,50 @@ class ArticleFactory extends Factory
             'excerpt' => fake()->paragraph(2),
             'tags' => fake()->randomElements(['systems', 'databases', 'networking', 'llm', 'math', 'c', 'rust'], 2),
             'status' => ArticleStatus::Ready,
-            'word_count' => fake()->numberBetween(800, 8000),
+            'byline' => fake()->name(),
+            'content_html' => $html,
+            'content_text' => $text,
+            'word_count' => str_word_count($text),
             'fetched_at' => now(),
         ];
     }
 
     public function queued(): static
     {
-        return $this->state(['status' => ArticleStatus::Queued, 'title' => null, 'excerpt' => null, 'word_count' => null, 'fetched_at' => null]);
+        return $this->state([
+            'status' => ArticleStatus::Queued,
+            'title' => null,
+            'byline' => null,
+            'excerpt' => null,
+            'content_html' => null,
+            'content_text' => null,
+            'word_count' => null,
+            'fetched_at' => null,
+        ]);
+    }
+
+    /**
+     * Sanitized-looking article markup and its plain text, like ArticleExtractor stores.
+     *
+     * @return array{string, string}
+     */
+    private function content(): array
+    {
+        $html = '';
+        $text = [];
+
+        foreach (range(1, 3) as $section) {
+            $heading = rtrim(fake()->sentence(4), '.');
+            $html .= "<h2>{$section}. {$heading}</h2>";
+            $text[] = "{$section}. {$heading}";
+
+            foreach (fake()->paragraphs(3) as $paragraph) {
+                $html .= "<p>{$paragraph}</p>";
+                $text[] = $paragraph;
+            }
+        }
+
+        return [$html, implode(' ', $text)];
     }
 
     public function fetching(): static

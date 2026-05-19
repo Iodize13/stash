@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Article;
+use App\Models\Highlight;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -42,7 +43,10 @@ class DatabaseSeeder extends Seeder
     private function seedArticles(User $owner): void
     {
         Article::withoutEvents(function () use ($owner) {
-            Article::factory()->count(22)->for($owner)->create();
+            Article::factory()->count(22)->for($owner)->create()
+                ->take(8)
+                ->each(fn (Article $article) => collect(range(0, fake()->numberBetween(1, 4)))
+                    ->each(fn (int $n) => Highlight::factory()->quoting($article, $n * 4 + 1)->create()));
             Article::factory()->count(6)->for($owner)->read()->archived()->create();
             Article::factory()->count(3)->for($owner)->queued()->create();
             Article::factory()->for($owner)->fetching()->create();
