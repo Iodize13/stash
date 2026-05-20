@@ -2,12 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Actions\SaveLink;
 use App\Enums\ArticleStatus;
 use App\Models\Article;
-use App\Support\UrlNormalizer;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
-use InvalidArgumentException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -38,36 +37,11 @@ class Library extends Component
 
     public string $tags = '';
 
-    public function ingest(): void
+    public function ingest(SaveLink $saveLink): void
     {
         $this->authorize('create', Article::class);
 
-        $this->validate(['url' => ['required', 'url:http,https', 'max:2048']]);
-
-        try {
-            $normalized = UrlNormalizer::normalize($this->url);
-        } catch (InvalidArgumentException) {
-            $this->addError('url', 'Enter a valid http(s) link.');
-
-            return;
-        }
-
-        $hash = UrlNormalizer::hash($normalized);
-
-        if (Article::where('url_hash', $hash)->exists()) {
-            $this->addError('url', 'This link is already in your library.');
-
-            return;
-        }
-
-        Article::create([
-            'user_id' => auth()->id(),
-            'url' => $normalized,
-            'url_hash' => $hash,
-            'domain' => UrlNormalizer::domain($normalized),
-            'tags' => UrlNormalizer::tags($this->tags),
-            'status' => ArticleStatus::Queued,
-        ]);
+        $saveLink->handle(auth()->user(), $this->url, $this->tags);
 
         $this->reset('url', 'tags');
         $this->resetPage();

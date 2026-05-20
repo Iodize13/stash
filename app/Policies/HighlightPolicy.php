@@ -2,17 +2,17 @@
 
 namespace App\Policies;
 
-use App\Models\Article;
+use App\Models\Highlight;
 use App\Models\User;
 
-class ArticlePolicy
+class HighlightPolicy
 {
     public function viewAny(User $user): bool
     {
         return $user->hasAnyRole(['admin', 'demo']);
     }
 
-    public function view(User $user, Article $article): bool
+    public function view(User $user, Highlight $highlight): bool
     {
         return $this->viewAny($user);
     }
@@ -22,12 +22,12 @@ class ArticlePolicy
         return $user->hasRole('admin');
     }
 
-    public function update(User $user, Article $article): bool
+    public function update(User $user, Highlight $highlight): bool
     {
         return $user->hasRole('admin');
     }
 
-    public function delete(User $user, Article $article): bool
+    public function delete(User $user, Highlight $highlight): bool
     {
         return $user->hasRole('admin');
     }

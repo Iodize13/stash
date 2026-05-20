@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 #[Fillable(['user_id', 'url', 'url_hash', 'domain', 'title', 'byline', 'excerpt', 'content_html', 'content_text', 'tags', 'status', 'error', 'word_count', 'fetched_at', 'read_at', 'archived_at'])]
 #[Hidden(['content_html', 'content_text'])]
@@ -22,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Article extends Model
 {
     /** @use HasFactory<ArticleFactory> */
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /**
      * @return array<string, string>
@@ -36,6 +38,18 @@ class Article extends Model
             'read_at' => 'datetime',
             'archived_at' => 'datetime',
         ];
+    }
+
+    /**
+     * History shown in the admin panel: fetch status transitions (from the queue,
+     * no causer) and edits made by people.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['title', 'status', 'error', 'tags', 'read_at', 'archived_at'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
     }
 
     /** @return BelongsTo<User, $this> */

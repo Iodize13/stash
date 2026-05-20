@@ -117,8 +117,8 @@ it('filters by tab and status', function () {
 });
 
 it('searches titles, domains and tags', function () {
-    Article::factory()->create(['title' => 'LSM trees explained', 'tags' => ['storage']]);
-    Article::factory()->create(['title' => 'Something else', 'tags' => ['llm']]);
+    Article::factory()->create(['title' => 'LSM trees explained', 'tags' => ['storage'], 'url' => 'https://a.test/1', 'excerpt' => null]);
+    Article::factory()->create(['title' => 'Something else', 'tags' => ['llm'], 'url' => 'https://b.test/2', 'excerpt' => null]);
 
     $test = Livewire::actingAs(libraryUser('admin'))->test(Library::class);
 
