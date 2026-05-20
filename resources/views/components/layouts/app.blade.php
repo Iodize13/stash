@@ -37,6 +37,10 @@
                             <x-material-icon name="auto_stories" class="text-[18px]" />
                             Library &amp; Queue
                         </a>
+                        <a href="{{ App\Filament\Resources\Collections\CollectionResource::getUrl() }}" class="flex items-center gap-3 border-l-2 border-transparent px-3 py-2 text-muted hover:text-fg">
+                            <x-material-icon name="folder_shared" class="text-[18px]" />
+                            Collections
+                        </a>
                         <a href="{{ url('/admin') }}" class="flex items-center gap-3 border-l-2 border-transparent px-3 py-2 text-muted hover:text-fg">
                             <x-material-icon name="admin_panel_settings" class="text-[18px]" />
                             Admin panel

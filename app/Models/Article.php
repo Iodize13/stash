@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['user_id', 'url', 'url_hash', 'domain', 'title', 'byline', 'excerpt', 'content_html', 'content_text', 'tags', 'status', 'error', 'word_count', 'fetched_at', 'read_at', 'archived_at'])]
@@ -41,6 +42,12 @@ class Article extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** @return BelongsToMany<Collection, $this> */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class)->withPivot(['position', 'note'])->withTimestamps();
     }
 
     /** @return HasMany<Highlight, $this> */

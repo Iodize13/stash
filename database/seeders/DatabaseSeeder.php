@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Article;
+use App\Models\Collection;
 use App\Models\Highlight;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -43,10 +44,20 @@ class DatabaseSeeder extends Seeder
     private function seedArticles(User $owner): void
     {
         Article::withoutEvents(function () use ($owner) {
-            Article::factory()->count(22)->for($owner)->create()
+            $highlighted = Article::factory()->count(22)->for($owner)->create()
                 ->take(8)
                 ->each(fn (Article $article) => collect(range(0, fake()->numberBetween(1, 4)))
                     ->each(fn (int $n) => Highlight::factory()->quoting($article, $n * 4 + 1)->create()));
+
+            $collection = Collection::factory()->for($owner)->public()->create([
+                'title' => 'Systems reading list',
+                'slug' => 'systems-reading',
+                'description' => 'Papers and essays on storage engines, networking and distributed systems, with the passages worth remembering.',
+            ]);
+            $highlighted->take(4)->values()->each(fn (Article $article, int $i) => $collection->articles()->attach($article, [
+                'position' => $i,
+                'note' => $i % 2 === 0 ? fake()->sentence(16) : null,
+            ]));
             Article::factory()->count(6)->for($owner)->read()->archived()->create();
             Article::factory()->count(3)->for($owner)->queued()->create();
             Article::factory()->for($owner)->fetching()->create();
