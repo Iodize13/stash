@@ -38,6 +38,7 @@
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
+                    wire:target="ingest"
                     class="flex items-center justify-center gap-2 bg-accent px-5 py-3 text-xs font-bold text-canvas hover:brightness-110 disabled:opacity-60"
                 >
                     <x-material-icon name="downloading" class="text-[17px]" />
@@ -65,7 +66,7 @@
             <div class="grid gap-4 lg:grid-cols-2">
                 @foreach ($pipeline as $item)
                     @php($failed = $item->status === App\Enums\ArticleStatus::Failed)
-                    <div wire:key="pipe-{{ $item->id }}" class="relative flex flex-col justify-between gap-3 bg-canvas p-4">
+                    <div wire:key="pipe-{{ $item->id }}" class="relative flex flex-col justify-between gap-3 bg-canvas p-4 transition-colors hover:bg-raised">
                         <div @class(['absolute inset-x-0 top-0 h-1', 'bg-hot' => $failed, 'animate-pulse bg-accent' => ! $failed])></div>
 
                         <div class="flex items-center justify-between text-xs">
@@ -77,7 +78,7 @@
                         </div>
 
                         <div class="flex flex-col gap-1">
-                            <p class="truncate font-sans text-sm">{{ $item->title ?? $item->url }}</p>
+                            <a href="{{ route('articles.show', $item) }}" wire:navigate class="truncate font-sans text-sm after:absolute after:inset-0">{{ $item->title ?? $item->url }}</a>
                             <p class="truncate text-xs text-dim">
                                 {{ $item->domain }}@if ($failed && $item->error) · {{ $item->error }}@endif
                             </p>
@@ -91,7 +92,7 @@
                             </span>
                             @if ($failed)
                                 @can('update', $item)
-                                    <span class="flex items-center gap-2">
+                                    <span class="relative z-10 flex items-center gap-2">
                                         <button wire:click="retry({{ $item->id }})" class="bg-[#fff7fb] px-2.5 py-2 text-[11px] font-bold text-hot hover:brightness-95">RETRY NOW</button>
                                         <button wire:click="delete({{ $item->id }})" wire:confirm="Remove this link?" class="text-[11px] text-dim hover:text-fg">Dismiss</button>
                                     </span>
@@ -175,7 +176,7 @@
         <div class="flex flex-col gap-3.5">
             @forelse ($articles as $article)
                 @php($style = $statusStyles[$article->status->value])
-                <article wire:key="article-{{ $article->id }}" class="flex flex-col justify-between gap-6 bg-panel p-6">
+                <article wire:key="article-{{ $article->id }}" class="relative flex flex-col justify-between gap-6 bg-panel p-6 transition-colors hover:bg-raised">
                     <div class="flex gap-4">
                         <div class="flex size-10 shrink-0 items-center justify-center bg-canvas">
                             <x-material-icon :name="$style['icon']" @class(['text-[20px]', $style['color']]) />
@@ -195,7 +196,10 @@
                                 <span class="text-dim">Saved {{ $article->created_at->diffForHumans() }}</span>
                             </div>
 
-                            <h3 class="font-sans text-lg leading-snug">{{ $article->title ?? $article->url }}</h3>
+                            <h3 class="font-sans text-lg leading-snug">
+                                {{-- Stretched link: the whole card opens the reader; buttons sit above it. --}}
+                                <a href="{{ route('articles.show', $article) }}" wire:navigate class="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-accent">{{ $article->title ?? $article->url }}</a>
+                            </h3>
 
                             @if ($article->excerpt)
                                 <p class="font-sans text-sm text-muted">{{ $article->excerpt }}</p>
@@ -218,7 +222,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2" x-data="{ copied: false }">
+                    <div class="relative z-10 flex w-fit items-center gap-2" x-data="{ copied: false }">
                         <a href="{{ route('articles.show', $article) }}" wire:navigate class="flex h-8 items-center gap-1.5 bg-accent px-4 text-xs font-bold text-canvas hover:brightness-110">
                             <x-material-icon name="chrome_reader_mode" class="text-[16px]" /> READ
                         </a>

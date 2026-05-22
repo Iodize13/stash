@@ -25,6 +25,24 @@ services:
         depends_on:
             - pgsql
             - redis
+    queue:
+        image: 'sail-8.5/app'
+        # queue:listen reloads the app for every job, so code edits apply without a restart (dev only).
+        command: ['php', '/var/www/html/artisan', 'queue:listen', '--tries=3', '--timeout=90', '--sleep=1']
+        restart: unless-stopped
+        environment:
+            WWWUSER: '${WWWUSER}'
+            SUPERVISOR_PHP_USER: '${SUPERVISOR_PHP_USER:-sail}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            pgsql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
     pgsql:
         image: 'postgres:18-alpine'
         ports:

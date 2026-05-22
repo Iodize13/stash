@@ -161,3 +161,10 @@ it('paginates ten articles per page', function () {
         ->call('gotoPage', 2)
         ->assertSee('Showing 11 – 12 of 12');
 });
+
+it('links each card to the reader', function () {
+    $article = Article::factory()->create();
+
+    Livewire::actingAs(libraryUser('demo'))->test(Library::class)
+        ->assertSeeHtml('href="'.route('articles.show', $article).'"');
+});
