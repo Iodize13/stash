@@ -1,15 +1,19 @@
 <?php
 
+use App\Http\Controllers\DemoLoginController;
 use App\Http\Controllers\ExportHighlightsController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicCollectionController;
 use App\Livewire\Library;
 use App\Livewire\Reader;
 use App\Models\Article;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', LandingController::class)->name('home');
+
+Route::post('/demo', DemoLoginController::class)
+    ->middleware(['guest', 'throttle:10,1'])
+    ->name('demo');
 
 Route::controller(PublicCollectionController::class)->prefix('c/{slug}')->group(function () {
     Route::get('/', 'show')->name('collections.show');

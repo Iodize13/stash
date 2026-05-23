@@ -32,6 +32,10 @@
             </div>
         </header>
 
+        <a href="{{ route('home') }}" class="block border-b border-line bg-panel px-4 py-2 text-center text-xs text-muted hover:text-fg">
+            This collection was curated with <span class="text-accent">{{ config('app.name') }}</span>, a read-later app with highlights. See how it works →
+        </a>
+
         <main class="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 lg:px-8">
             <section class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
                 <div class="flex flex-col gap-4">
@@ -166,7 +170,7 @@
 
         <footer class="border-t border-line bg-rail">
             <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 text-xs text-dim sm:flex-row sm:items-center sm:justify-between lg:px-8">
-                <span class="flex items-center gap-2"><span class="size-3 bg-accent"></span> Curated with {{ config('app.name') }}</span>
+                <a href="{{ route('home') }}" class="flex items-center gap-2 hover:text-fg"><span class="size-3 bg-accent"></span> Curated with {{ config('app.name') }} · how it works →</a>
                 <span class="flex gap-4">
                     <a href="{{ route('collections.feed', $collection) }}" class="hover:text-fg">Atom feed</a>
                     <a href="{{ route('collections.export', $collection) }}" class="hover:text-fg">Markdown export</a>
