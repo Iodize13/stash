@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\DemoLoginController;
+use App\Http\Controllers\ExportAllHighlightsController;
 use App\Http\Controllers\ExportHighlightsController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicCollectionController;
+use App\Livewire\Highlights;
 use App\Livewire\Library;
 use App\Livewire\Reader;
 use App\Models\Article;
+use App\Models\Highlight;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('home');
@@ -25,6 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/library', Library::class)
         ->middleware('can:viewAny,'.Article::class)
         ->name('library');
+
+    Route::get('/highlights', Highlights::class)
+        ->middleware('can:viewAny,'.Highlight::class)
+        ->name('highlights');
+
+    Route::get('/highlights.md', ExportAllHighlightsController::class)->name('highlights.export');
 
     Route::get('/articles/{article}', Reader::class)->name('articles.show');
 

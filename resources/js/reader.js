@@ -103,6 +103,10 @@ document.addEventListener('alpine:init', () => {
             this.$watch('family', () => this.savePrefs());
             this.render();
             this.onScroll();
+
+            // Deep link from the highlights page: /articles/1#hl-42
+            const target = location.hash.match(/^#hl-(\d+)$/);
+            if (target) setTimeout(() => this.jump(target[1]), 300);
         },
 
         savePrefs() {

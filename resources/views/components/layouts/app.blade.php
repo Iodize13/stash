@@ -37,6 +37,18 @@
                             <x-material-icon name="auto_stories" class="text-[18px]" />
                             Library &amp; Queue
                         </a>
+                        <a
+                            href="{{ route('highlights') }}"
+                            wire:navigate
+                            @class([
+                                'flex items-center gap-3 border-l-2 px-3 py-2',
+                                'border-accent bg-raised font-medium text-accent' => request()->routeIs('highlights'),
+                                'border-transparent text-muted hover:text-fg' => ! request()->routeIs('highlights'),
+                            ])
+                        >
+                            <x-material-icon name="border_color" class="text-[18px]" />
+                            Highlights &amp; Notes
+                        </a>
                         <a href="{{ App\Filament\Resources\Collections\CollectionResource::getUrl() }}" class="flex items-center gap-3 border-l-2 border-transparent px-3 py-2 text-muted hover:text-fg">
                             <x-material-icon name="folder_shared" class="text-[18px]" />
                             Collections

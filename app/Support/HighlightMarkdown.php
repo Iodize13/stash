@@ -52,6 +52,32 @@ class HighlightMarkdown
             .$sections->implode("\n");
     }
 
+    /**
+     * Every highlight, grouped by article (most recently highlighted first).
+     */
+    public static function all(): string
+    {
+        $articles = Article::query()
+            ->whereHas('highlights')
+            ->with(['highlights' => fn ($query) => $query->oldest()->oldest('id')])
+            ->withMax('highlights', 'created_at')
+            ->orderByDesc('highlights_max_created_at')
+            ->get();
+
+        $sections = $articles->map(fn (Article $article) => '## '.($article->title ?? $article->url)
+            ."\n\nSource: <{$article->url}>\n\n"
+            .self::highlights($article->highlights));
+
+        return self::frontmatter([
+            'title' => 'All highlights',
+            'exported' => now()->toDateString(),
+            'articles' => $articles->count(),
+            'highlights' => $articles->sum(fn (Article $article) => $article->highlights->count()),
+        ])
+            ."# All highlights\n\n"
+            .($sections->isEmpty() ? "_No highlights yet._\n" : $sections->implode("\n"));
+    }
+
     public static function download(string $markdown, string $name): Response
     {
         $filename = Str::slug($name) ?: 'highlights';

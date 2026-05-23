@@ -47,6 +47,9 @@
     direction: ltr;
     font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
+    /* A name missing from the font renders as plain text; keep it to one glyph's width. */
+    width: 1em;
+    overflow: hidden;
 }
 
 /* Reader: typography for sanitized article markup (no typography plugin). */
