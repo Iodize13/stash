@@ -50,9 +50,10 @@
                 <p class="text-xs text-hot" role="alert">{{ $message }}</p>
             @enderror
 
-            <p class="border-t border-line pt-2 text-xs text-dim">
-                Shortcuts: <kbd class="bg-canvas px-1 text-muted">/</kbd> find
-            </p>
+            <div class="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-2 text-xs text-dim">
+                <p>Shortcuts: <kbd class="bg-canvas px-1 text-muted">/</kbd> find</p>
+                <p class="flex items-center gap-2">Save from any page: drag @include('partials.bookmarklet') to your bookmarks bar</p>
+            </div>
         </section>
     @endcan
 

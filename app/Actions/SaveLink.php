@@ -6,6 +6,7 @@ use App\Enums\ArticleStatus;
 use App\Models\Article;
 use App\Models\User;
 use App\Support\UrlNormalizer;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
@@ -17,10 +18,11 @@ class SaveLink
 {
     /**
      * @param  string  $field  Validation error key, so each caller can map errors to its own form field.
+     * @param  string|null  $title  Provisional title (e.g. the page title from the bookmarklet), replaced once fetched.
      *
      * @throws ValidationException
      */
-    public function handle(User $user, string $url, string $tags = '', string $field = 'url'): Article
+    public function handle(User $user, string $url, string $tags = '', string $field = 'url', ?string $title = null): Article
     {
         // Validate under a plain key: a field like "data.url" would be read as a nested path.
         $validator = validator(['url' => $url], ['url' => ['required', 'url:http,https', 'max:2048']]);
@@ -45,6 +47,7 @@ class SaveLink
             'url' => $normalized,
             'url_hash' => $hash,
             'domain' => UrlNormalizer::domain($normalized),
+            'title' => filled($title) ? Str::limit(trim($title), 250) : null,
             'tags' => UrlNormalizer::tags($tags),
             'status' => ArticleStatus::Queued,
         ]);

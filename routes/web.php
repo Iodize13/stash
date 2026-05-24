@@ -5,6 +5,7 @@ use App\Http\Controllers\ExportAllHighlightsController;
 use App\Http\Controllers\ExportHighlightsController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicCollectionController;
+use App\Http\Controllers\SaveLinkPopupController;
 use App\Livewire\Highlights;
 use App\Livewire\Library;
 use App\Livewire\Reader;
@@ -28,6 +29,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/library', Library::class)
         ->middleware('can:viewAny,'.Article::class)
         ->name('library');
+
+    Route::get('/save', [SaveLinkPopupController::class, 'show'])->name('save');
+    Route::post('/save', [SaveLinkPopupController::class, 'store'])
+        ->middleware('throttle:30,1')
+        ->name('save.store');
 
     Route::get('/highlights', Highlights::class)
         ->middleware('can:viewAny,'.Highlight::class)
