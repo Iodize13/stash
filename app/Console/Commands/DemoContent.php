@@ -111,16 +111,27 @@ class DemoContent extends Command
     }
 
     /**
-     * The opening definition-style sentences of the article: short enough to read
-     * in a card, long enough to say something.
+     * Opening sentences from the article's paragraphs (not infoboxes or tables):
+     * short enough to read in a card, long enough to say something, and free of
+     * citation markers like [1].
      *
      * @return list<string>
      */
     private function sentences(Article $article): array
     {
-        preg_match_all('/[A-Z][^.!?]{60,260}[.!?](?=\s|$)/u', (string) $article->content_text, $matches);
+        preg_match_all('#<p\b[^>]*>(.*?)</p>#su', (string) $article->content_html, $paragraphs);
 
-        return array_slice(array_values(array_unique($matches[0])), 0, 2);
+        return collect($paragraphs[1])
+            ->map(fn (string $html) => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5))))
+            ->flatMap(fn (string $text) => preg_split('/(?<=[.!?])\s+(?=[A-Z])/u', $text, -1, PREG_SPLIT_NO_EMPTY))
+            ->filter(fn (string $sentence) => mb_strlen($sentence) >= 60
+                && mb_strlen($sentence) <= 260
+                && preg_match('/^[A-Z]/u', $sentence)
+                && ! str_contains($sentence, '['))
+            ->unique()
+            ->take(2)
+            ->values()
+            ->all();
     }
 
     private function quote(Article $article, string $exact, HighlightColor $color, ?string $note): void

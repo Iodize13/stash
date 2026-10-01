@@ -59,7 +59,8 @@ it('highlights fetched articles and publishes a collection', function () {
         'url' => $url,
         'url_hash' => UrlNormalizer::hash(UrlNormalizer::normalize($url)),
         'status' => ArticleStatus::Ready,
-        'content_text' => $text,
+        'content_text' => 'Log-structured merge-tree TypeTree Invented 1996 '.$text,
+        'content_html' => '<table><tr><td>TypeTree Invented 1996</td></tr></table><p>'.$text.'</p>',
     ]);
 
     $this->artisan('stash:demo-content', ['email' => 'owner@example.com', '--highlight' => true])
