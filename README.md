@@ -2,6 +2,8 @@
 
 Read-later + knowledge base app built with the TALL stack and Filament: save a link, a queue worker fetches and cleans the article, read it and highlight passages with notes, then publish chosen highlights as a public collection.
 
+**Live demo: [stash.ionize13.com](https://stash.ionize13.com)** ("Try the demo" signs in as a read-only user) · [Example public collection](https://stash.ionize13.com/c/systems-reading-list)
+
 ![Saving a link, reading it, highlighting a passage and publishing a collection](docs/demo.gif)
 
 ## Stack
