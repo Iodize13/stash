@@ -52,3 +52,7 @@ The app is served at <http://localhost:8080> (`APP_PORT`; rootless Docker cannot
 ## API
 
 `GET /api/user` requires `Authorization: Bearer <personal access token>`.
+
+## Deploying
+
+See [docs/deploy.md](docs/deploy.md) for Laravel Cloud settings: environment variables, Bun build commands, the queue worker and creating the first accounts.
