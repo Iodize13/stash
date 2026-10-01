@@ -53,6 +53,18 @@
                             <x-material-icon name="folder_shared" class="text-[18px]" />
                             Collections
                         </a>
+                        <a
+                            href="{{ route('settings.tokens') }}"
+                            wire:navigate
+                            @class([
+                                'flex items-center gap-3 border-l-2 px-3 py-2',
+                                'border-accent bg-raised font-medium text-accent' => request()->routeIs('settings.tokens'),
+                                'border-transparent text-muted hover:text-fg' => ! request()->routeIs('settings.tokens'),
+                            ])
+                        >
+                            <x-material-icon name="key" class="text-[18px]" />
+                            API tokens
+                        </a>
                         <a href="{{ url('/admin') }}" class="flex items-center gap-3 border-l-2 border-transparent px-3 py-2 text-muted hover:text-fg">
                             <x-material-icon name="admin_panel_settings" class="text-[18px]" />
                             Admin panel

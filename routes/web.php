@@ -6,6 +6,7 @@ use App\Http\Controllers\ExportHighlightsController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PublicCollectionController;
 use App\Http\Controllers\SaveLinkPopupController;
+use App\Livewire\ApiTokens;
 use App\Livewire\Highlights;
 use App\Livewire\Library;
 use App\Livewire\Reader;
@@ -34,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/save', [SaveLinkPopupController::class, 'store'])
         ->middleware('throttle:30,1')
         ->name('save.store');
+
+    Route::get('/settings/tokens', ApiTokens::class)->name('settings.tokens');
 
     Route::get('/highlights', Highlights::class)
         ->middleware('can:viewAny,'.Highlight::class)

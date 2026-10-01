@@ -1,6 +1,6 @@
 @php
     $steps = [
-        ['add_link', 'text-accent', 'Save', 'Paste a link. It is normalized (tracking parameters stripped) and de-duplicated, then queued.', 'Livewire · Eloquent observers'],
+        ['add_link', 'text-accent', 'Save', 'Paste a link, click the bookmarklet, or use the API. It is normalized and de-duplicated, then queued.', 'Livewire · Sanctum API'],
         ['sync', 'text-accent', 'Fetch & extract', 'A queue worker downloads the page behind an SSRF guard, extracts the article and sanitizes it.', 'Redis queue · Readability · HtmlSanitizer'],
         ['border_color', 'text-hot', 'Read & highlight', 'A distraction-free reader. Select any passage to highlight it, add a note and tags.', 'Alpine · text-quote selectors'],
         ['folder_shared', 'text-ok', 'Publish', 'Group articles into a collection and share its highlights, with an Atom feed and Markdown export.', 'Filament · Policies'],
