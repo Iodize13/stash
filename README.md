@@ -1,6 +1,8 @@
-# Larvel
+# Stash
 
-Read-later + knowledge base app built with the TALL stack and Filament.
+Read-later + knowledge base app built with the TALL stack and Filament: save a link, a queue worker fetches and cleans the article, read it and highlight passages with notes, then publish chosen highlights as a public collection.
+
+![Saving a link, reading it, highlighting a passage and publishing a collection](docs/demo.gif)
 
 ## Stack
 
