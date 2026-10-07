@@ -106,6 +106,7 @@ class Reader extends Component
             'highlights' => $highlights,
             'anchors' => $highlights->map->anchor()->values(),
             'next' => Article::unread()
+                ->whereBelongsTo(auth()->user())
                 ->where('status', ArticleStatus::Ready)
                 ->whereKeyNot($this->article->getKey())
                 ->oldest()

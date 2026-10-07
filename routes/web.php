@@ -4,6 +4,7 @@ use App\Http\Controllers\DemoLoginController;
 use App\Http\Controllers\ExportAllHighlightsController;
 use App\Http\Controllers\ExportHighlightsController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\PublicCollectionController;
 use App\Http\Controllers\SaveLinkPopupController;
 use App\Livewire\ApiTokens;
@@ -17,8 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LandingController::class)->name('home');
 
 Route::post('/demo', DemoLoginController::class)
-    ->middleware(['guest', 'throttle:10,1'])
+    ->middleware(['guest', 'throttle:5,60'])
     ->name('demo');
+
+Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 
 Route::controller(PublicCollectionController::class)->prefix('c/{slug}')->group(function () {
     Route::get('/', 'show')->name('collections.show');

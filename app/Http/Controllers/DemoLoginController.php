@@ -2,27 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Actions\CreateSandbox;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Signs visitors in as the shared demo user. Safe to expose because the demo
- * role is read-only everywhere (enforced by policies, covered by tests).
+ * "Try the demo": signs the visitor in to a fresh private sandbox.
  */
 class DemoLoginController extends Controller
 {
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(Request $request, CreateSandbox $createSandbox): RedirectResponse
     {
         abort_unless(config('stash.demo_login'), 404);
 
-        // whereHas rather than User::role(): the latter throws if the role was never created.
-        $demo = User::whereHas('roles', fn ($query) => $query->where('name', 'demo'))->oldest('id')->first();
+        $sandbox = $createSandbox->handle();
 
-        abort_if($demo === null, 404);
+        abort_if($sandbox === null, 503, 'The demo is busy right now. Please try again later.');
 
-        Auth::login($demo);
+        Auth::login($sandbox);
         $request->session()->regenerate();
 
         return redirect()->route('library');

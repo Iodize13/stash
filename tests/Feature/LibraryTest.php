@@ -30,14 +30,17 @@ it('forbids users without a role', function () {
     $this->actingAs(libraryUser(null))->get('/library')->assertForbidden();
 });
 
-it('shows saved articles to admin and demo users', function (string $role) {
-    Article::factory()->create(['title' => 'Epoll internals']);
+it('shows each user only their own articles', function (string $role) {
+    $user = libraryUser($role);
+    Article::factory()->for($user)->create(['title' => 'Epoll internals']);
+    Article::factory()->create(['title' => 'Someone else entirely']);
 
-    $this->actingAs(libraryUser($role))
+    $this->actingAs($user)
         ->get('/library')
         ->assertOk()
-        ->assertSee('Epoll internals');
-})->with(['admin', 'demo']);
+        ->assertSee('Epoll internals')
+        ->assertDontSee('Someone else entirely');
+})->with(['admin', 'demo', 'guest']);
 
 it('lets an admin save a link as a queued article with normalized url and tags', function () {
     $admin = libraryUser('admin');
@@ -104,12 +107,13 @@ it('keeps the demo user read-only', function () {
 });
 
 it('filters by tab and status', function () {
-    Article::factory()->create(['title' => 'Unread one']);
-    Article::factory()->read()->create(['title' => 'Already read']);
-    Article::factory()->archived()->create(['title' => 'Old archived']);
-    Article::factory()->failed()->create(['title' => 'Broken one']);
+    $admin = libraryUser('admin');
+    Article::factory()->for($admin)->create(['title' => 'Unread one']);
+    Article::factory()->for($admin)->read()->create(['title' => 'Already read']);
+    Article::factory()->for($admin)->archived()->create(['title' => 'Old archived']);
+    Article::factory()->for($admin)->failed()->create(['title' => 'Broken one']);
 
-    $test = Livewire::actingAs(libraryUser('admin'))->test(Library::class);
+    $test = Livewire::actingAs($admin)->test(Library::class);
 
     $test->set('tab', 'unread')->assertSee('Unread one')->assertDontSee('Already read')->assertDontSee('Old archived');
     $test->set('tab', 'archived')->assertSee('Old archived')->assertDontSee('Unread one');
@@ -117,10 +121,11 @@ it('filters by tab and status', function () {
 });
 
 it('searches titles, domains and tags', function () {
-    Article::factory()->create(['title' => 'LSM trees explained', 'tags' => ['storage'], 'url' => 'https://a.test/1', 'excerpt' => null]);
-    Article::factory()->create(['title' => 'Something else', 'tags' => ['llm'], 'url' => 'https://b.test/2', 'excerpt' => null]);
+    $admin = libraryUser('admin');
+    Article::factory()->for($admin)->create(['title' => 'LSM trees explained', 'tags' => ['storage'], 'url' => 'https://a.test/1', 'excerpt' => null]);
+    Article::factory()->for($admin)->create(['title' => 'Something else', 'tags' => ['llm'], 'url' => 'https://b.test/2', 'excerpt' => null]);
 
-    $test = Livewire::actingAs(libraryUser('admin'))->test(Library::class);
+    $test = Livewire::actingAs($admin)->test(Library::class);
 
     $test->set('search', 'lsm')->assertSee('LSM trees explained')->assertDontSee('Something else');
     $test->set('search', 'llm')->assertSee('Something else')->assertDontSee('LSM trees explained');
@@ -154,17 +159,19 @@ it('retries, archives and deletes as admin', function () {
 });
 
 it('paginates ten articles per page', function () {
-    Article::factory()->count(12)->create();
+    $admin = libraryUser('admin');
+    Article::factory()->count(12)->for($admin)->create();
 
-    Livewire::actingAs(libraryUser('admin'))->test(Library::class)
+    Livewire::actingAs($admin)->test(Library::class)
         ->assertSee('Showing 1 – 10 of 12')
         ->call('gotoPage', 2)
         ->assertSee('Showing 11 – 12 of 12');
 });
 
 it('links each card to the reader', function () {
-    $article = Article::factory()->create();
+    $user = libraryUser('admin');
+    $article = Article::factory()->for($user)->create();
 
-    Livewire::actingAs(libraryUser('demo'))->test(Library::class)
+    Livewire::actingAs($user)->test(Library::class)
         ->assertSeeHtml('href="'.route('articles.show', $article).'"');
 });

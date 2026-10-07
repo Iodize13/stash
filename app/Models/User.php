@@ -8,7 +8,9 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,12 +22,28 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, HasRoles, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, MassPrunable, Notifiable;
 
     /** @return HasMany<Article, $this> */
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
+    }
+
+    public function isSandbox(): bool
+    {
+        return $this->sandbox_expires_at !== null;
+    }
+
+    /**
+     * Expired sandbox accounts, removed by the scheduled `model:prune`. Their
+     * articles, highlights and collection rows go with them via cascading keys.
+     *
+     * @return Builder<User>
+     */
+    public function prunable(): Builder
+    {
+        return static::query()->whereNotNull('sandbox_expires_at')->where('sandbox_expires_at', '<', now());
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -43,6 +61,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'sandbox_expires_at' => 'datetime',
         ];
     }
 }

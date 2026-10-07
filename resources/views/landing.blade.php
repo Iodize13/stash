@@ -61,7 +61,7 @@
             </div>
             @guest
                 @if ($demoAvailable)
-                    <p class="text-xs text-dim">The demo signs you in as a read-only user: browse the library, reader and admin panel; nothing can be changed.</p>
+                    <p class="text-xs text-dim">The demo gives you a private sandbox with a few sample articles: save your own links, read and highlight. Nobody else sees it, and it is deleted after {{ config('stash.sandbox.lifetime_hours') }} hours.</p>
                 @endif
             @endguest
         </section>

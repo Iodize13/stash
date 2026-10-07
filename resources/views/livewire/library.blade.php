@@ -146,7 +146,7 @@
                 @endforeach
             </div>
 
-            @can('update', new App\Models\Article)
+            @can('create', App\Models\Article::class)
                 <div class="flex items-center gap-2">
                     <button wire:click="markVisibleRead" class="flex items-center gap-1.5 bg-canvas px-3 py-2 text-muted hover:text-fg">
                         <x-material-icon name="done_all" class="text-[15px]" /> Mark read

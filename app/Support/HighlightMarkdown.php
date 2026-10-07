@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Article;
 use App\Models\Collection;
 use App\Models\Highlight;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
@@ -53,11 +54,11 @@ class HighlightMarkdown
     }
 
     /**
-     * Every highlight, grouped by article (most recently highlighted first).
+     * Every highlight of one user, grouped by article (most recently highlighted first).
      */
-    public static function all(): string
+    public static function all(User $user): string
     {
-        $articles = Article::query()
+        $articles = $user->articles()
             ->whereHas('highlights')
             ->with(['highlights' => fn ($query) => $query->oldest()->oldest('id')])
             ->withMax('highlights', 'created_at')

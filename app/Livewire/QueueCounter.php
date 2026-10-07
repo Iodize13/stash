@@ -10,6 +10,6 @@ class QueueCounter extends Component
 {
     public function render(): View
     {
-        return view('livewire.queue-counter', ['count' => Article::active()->count()]);
+        return view('livewire.queue-counter', ['count' => Article::active()->whereBelongsTo(auth()->user())->count()]);
     }
 }

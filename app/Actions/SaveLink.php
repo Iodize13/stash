@@ -39,6 +39,10 @@ class SaveLink
 
         $hash = UrlNormalizer::hash($normalized);
 
+        if ($user->isSandbox() && $user->articles()->count() >= config('stash.sandbox.max_links')) {
+            throw ValidationException::withMessages([$field => 'This demo sandbox holds up to '.config('stash.sandbox.max_links').' links. Delete one to save another.']);
+        }
+
         if ($user->articles()->where('url_hash', $hash)->exists()) {
             throw ValidationException::withMessages([$field => 'This link is already in your library.']);
         }

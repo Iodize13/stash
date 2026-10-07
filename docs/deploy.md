@@ -22,6 +22,8 @@ CACHE_STORE=database
 SESSION_DRIVER=database
 
 DEMO_LOGIN=true
+# Ready articles of this account are copied into every "Try the demo" sandbox
+SANDBOX_TEMPLATE_EMAIL=you@example.com
 REPOSITORY_URL=https://github.com/Iodize13/stash
 ```
 
@@ -55,6 +57,10 @@ php artisan queue:work --tries=3 --timeout=90 --sleep=3
 
 Without it, saved links stay `queued`.
 
+## 4b. Scheduler
+
+Enable the scheduler on the app instance. It runs `model:prune` hourly to delete expired demo sandboxes (and their articles) and `activitylog:clean` daily. With scale-to-zero on, tasks run once the instance wakes.
+
 ## 5. First accounts and content
 
 Production has no seeder. After the first deploy, run these from the Cloud command runner:
@@ -63,8 +69,8 @@ Production has no seeder. After the first deploy, run these from the Cloud comma
 # Your account (prints a generated password)
 php artisan stash:create-user you@example.com --name="Your Name"
 
-# The shared read-only account behind "Try the demo"
-php artisan stash:create-user demo@stash.local --name=Demo --role=demo
+# Optional: a read-only account that can browse everything, including the admin panel
+php artisan stash:create-user viewer@example.com --name=Viewer --role=demo
 
 # Optional: curated real articles, then highlights + a public collection once fetched
 php artisan stash:demo-content you@example.com
@@ -74,5 +80,5 @@ php artisan stash:demo-content you@example.com --highlight
 ## 6. Check
 
 - `/up` returns 200.
-- `/` shows the landing page; "Try the demo" signs in as the demo user.
+- `/` shows the landing page; "Try the demo" opens a fresh sandbox with the template's sample articles.
 - Saving a link in `/library` goes from QUEUED to READY within a few seconds (the worker is running).

@@ -23,14 +23,17 @@ it('requires a role', function () {
     $this->actingAs(highlightsUser(null))->get('/highlights')->assertForbidden();
 });
 
-it('lists highlights grouped by article with stats', function () {
-    $article = Article::factory()->create(['title' => 'Epoll internals']);
+it('lists the user\'s own highlights grouped by article with stats', function () {
+    $owner = highlightsUser('admin');
+    $article = Article::factory()->for($owner)->create(['title' => 'Epoll internals']);
+    Highlight::factory()->create(['exact' => 'Someone else\'s quote']);
     Highlight::factory()->for($article)->create(['exact' => 'Edge-triggered mode needs non-blocking sockets.', 'note' => 'Remember EAGAIN', 'color' => 'pink']);
     Highlight::factory()->for($article)->create(['exact' => 'Level-triggered is the default.', 'note' => null, 'tags' => []]);
 
-    $this->actingAs(highlightsUser('demo'))->get('/highlights')
+    $this->actingAs($owner)->get('/highlights')
         ->assertOk()
         ->assertSee('2 HIGHLIGHTS ACROSS 1 ARTICLE')
+        ->assertDontSee('Someone else&#039;s quote', escape: false)
         ->assertSee('Epoll internals')
         ->assertSee('Edge-triggered mode needs non-blocking sockets.')
         ->assertSee('Remember EAGAIN')
@@ -39,10 +42,12 @@ it('lists highlights grouped by article with stats', function () {
 });
 
 it('filters by search, color, notes and tags', function () {
-    $a = Highlight::factory()->create(['exact' => 'Alpha quote', 'color' => 'cyan', 'note' => 'has note', 'tags' => ['storage']]);
-    $b = Highlight::factory()->create(['exact' => 'Beta quote', 'color' => 'pink', 'note' => null, 'tags' => []]);
+    $owner = highlightsUser('admin');
+    $article = Article::factory()->for($owner)->create();
+    Highlight::factory()->for($article)->create(['exact' => 'Alpha quote', 'color' => 'cyan', 'note' => 'has note', 'tags' => ['storage']]);
+    Highlight::factory()->for($article)->create(['exact' => 'Beta quote', 'color' => 'pink', 'note' => null, 'tags' => []]);
 
-    $test = Livewire::actingAs(highlightsUser('admin'))->test(Highlights::class);
+    $test = Livewire::actingAs($owner)->test(Highlights::class);
 
     $test->set('search', 'alpha')->assertSee('Alpha quote')->assertDontSee('Beta quote');
     $test->set('search', 'storage')->assertSee('Alpha quote')->assertDontSee('Beta quote');
@@ -52,10 +57,11 @@ it('filters by search, color, notes and tags', function () {
 });
 
 it('shows a chronological view and an empty state', function () {
-    $article = Article::factory()->create(['title' => 'Timeline article']);
+    $owner = highlightsUser('admin');
+    $article = Article::factory()->for($owner)->create(['title' => 'Timeline article']);
     Highlight::factory()->for($article)->create(['exact' => 'First thing']);
 
-    $test = Livewire::actingAs(highlightsUser('admin'))->test(Highlights::class)->set('group', 'time');
+    $test = Livewire::actingAs($owner)->test(Highlights::class)->set('group', 'time');
     $test->assertSee('First thing')->assertSee('Timeline article');
 
     $test->set('search', 'nothing-matches-this')->assertSee('No highlights match these filters.');
@@ -80,14 +86,17 @@ it('lets admins edit notes and delete, but not demo users', function () {
 });
 
 it('exports every highlight as markdown', function () {
-    $article = Article::factory()->create(['title' => 'Exported article']);
+    $owner = highlightsUser('admin');
+    $article = Article::factory()->for($owner)->create(['title' => 'Exported article']);
     Highlight::factory()->for($article)->create(['exact' => 'Quoted line', 'note' => 'My note', 'tags' => []]);
+    Highlight::factory()->create(['exact' => 'Not mine']);
 
-    $response = $this->actingAs(highlightsUser('demo'))->get('/highlights.md')->assertOk();
+    $response = $this->actingAs($owner)->get('/highlights.md')->assertOk();
 
     expect($response->getContent())
         ->toStartWith("---\ntitle: \"All highlights\"")
-        ->toContain("## Exported article\n\nSource: <{$article->url}>\n\n> Quoted line\n\nMy note");
+        ->toContain("## Exported article\n\nSource: <{$article->url}>\n\n> Quoted line\n\nMy note")
+        ->not->toContain('Not mine');
 });
 
 it('does not mark a palette color as active when no color filter is set', function () {

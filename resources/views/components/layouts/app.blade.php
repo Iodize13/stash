@@ -49,6 +49,8 @@
                             <x-material-icon name="border_color" class="text-[18px]" />
                             Highlights &amp; Notes
                         </a>
+                        {{-- Sandbox guests get no admin panel, collections or tokens: they can never publish. --}}
+                        @if (auth()->user()?->hasAnyRole(['admin', 'demo']))
                         <a href="{{ App\Filament\Resources\Collections\CollectionResource::getUrl() }}" class="flex items-center gap-3 border-l-2 border-transparent px-3 py-2 text-muted hover:text-fg">
                             <x-material-icon name="folder_shared" class="text-[18px]" />
                             Collections
@@ -69,6 +71,7 @@
                             <x-material-icon name="admin_panel_settings" class="text-[18px]" />
                             Admin panel
                         </a>
+                        @endif
                     </nav>
                 </div>
 
@@ -84,7 +87,7 @@
                                     <span class="text-[10px] text-dim">{{ auth()->user()->getRoleNames()->first() }}</span>
                                 </div>
                             </div>
-                            <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+                            <form method="POST" action="{{ route('logout') }}" @if (auth()->user()->isSandbox()) onsubmit="return confirm('End the sandbox? Everything you saved in it is deleted.')" @endif>
                                 @csrf
                                 <button type="submit" class="p-1 text-muted hover:text-fg" title="Log out" aria-label="Log out">
                                     <x-material-icon name="logout" class="text-[16px]" />
@@ -116,6 +119,15 @@
                 </header>
 
                 <main class="flex flex-col gap-6 p-4 lg:p-8">
+                    @if (auth()->user()?->isSandbox())
+                        <div class="flex flex-wrap items-center justify-between gap-2 border border-accent/40 bg-panel px-4 py-2.5 text-xs">
+                            <p class="flex items-center gap-2 text-muted">
+                                <x-material-icon name="science" class="text-[16px] text-accent" />
+                                <span><span class="text-accent">Private demo sandbox.</span> Save links, read and highlight. Only you can see it; it is deleted {{ auth()->user()->sandbox_expires_at->diffForHumans() }}.</span>
+                            </p>
+                            <span class="text-dim">{{ auth()->user()->articles()->count() }} / {{ config('stash.sandbox.max_links') }} links</span>
+                        </div>
+                    @endif
                     {{ $slot }}
                 </main>
             </div>

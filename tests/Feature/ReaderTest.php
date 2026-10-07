@@ -174,11 +174,14 @@ it('re-queues a failed article', function () {
     Queue::assertPushed(FetchArticle::class);
 });
 
-it('links to the next unread article', function () {
+it('links to the next unread article of the same user', function () {
+    $admin = readerUser('admin');
     $current = readyArticle();
-    Article::factory()->create(['title' => 'Up next']);
+    $current->update(['user_id' => $admin->id]);
+    Article::factory()->create(['title' => 'Not mine', 'created_at' => now()->subYear()]);
+    Article::factory()->for($admin)->create(['title' => 'Up next']);
 
-    Livewire::actingAs(readerUser('admin'))->test(Reader::class, ['article' => $current])
+    Livewire::actingAs($admin)->test(Reader::class, ['article' => $current])
         ->assertSee('NEXT: Up next');
 });
 

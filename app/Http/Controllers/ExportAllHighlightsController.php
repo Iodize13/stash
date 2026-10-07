@@ -13,6 +13,6 @@ class ExportAllHighlightsController extends Controller
     {
         Gate::authorize('viewAny', Highlight::class);
 
-        return HighlightMarkdown::download(HighlightMarkdown::all(), 'highlights-'.now()->toDateString());
+        return HighlightMarkdown::download(HighlightMarkdown::all(request()->user()), 'highlights-'.now()->toDateString());
     }
 }

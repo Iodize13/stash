@@ -86,10 +86,20 @@ class Highlights extends Component
         ]);
     }
 
+    /**
+     * Highlights on the signed-in user's own articles.
+     *
+     * @return Builder<Highlight>
+     */
+    private function mine(): Builder
+    {
+        return Highlight::query()->whereIn('article_id', auth()->user()->articles()->select('id'));
+    }
+
     /** @return Builder<Highlight> */
     private function filteredQuery(): Builder
     {
-        $query = Highlight::query();
+        $query = $this->mine();
 
         if (HighlightColor::tryFrom($this->color)) {
             $query->where('color', $this->color);
@@ -120,14 +130,14 @@ class Highlights extends Component
      */
     private function stats(): array
     {
-        $colors = Highlight::toBase()->selectRaw('color, count(*) as total')->groupBy('color')->pluck('total', 'color');
+        $colors = $this->mine()->toBase()->selectRaw('color, count(*) as total')->groupBy('color')->pluck('total', 'color');
 
         return [
             'total' => (int) $colors->sum(),
-            'thisWeek' => Highlight::where('created_at', '>=', now()->subWeek())->count(),
-            'withNotes' => Highlight::whereNotNull('note')->count(),
-            'articles' => Highlight::distinct()->count('article_id'),
-            'tagged' => Highlight::whereJsonLength('tags', '>', 0)->count(),
+            'thisWeek' => $this->mine()->where('created_at', '>=', now()->subWeek())->count(),
+            'withNotes' => $this->mine()->whereNotNull('note')->count(),
+            'articles' => $this->mine()->distinct()->count('article_id'),
+            'tagged' => $this->mine()->whereJsonLength('tags', '>', 0)->count(),
             'colors' => collect(HighlightColor::cases())
                 ->mapWithKeys(fn (HighlightColor $c) => [$c->value => (int) ($colors[$c->value] ?? 0)])
                 ->all(),

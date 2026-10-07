@@ -57,9 +57,9 @@ class Library extends Component
 
     public function retryFailed(): void
     {
-        $this->authorize('update', new Article);
+        $this->authorize('create', Article::class);
 
-        Article::where('status', ArticleStatus::Failed)->each(fn (Article $article) => $article->requeue());
+        $this->mine()->where('status', ArticleStatus::Failed)->each(fn (Article $article) => $article->requeue());
     }
 
     public function toggleArchive(int $id): void
@@ -72,7 +72,7 @@ class Library extends Component
 
     public function markVisibleRead(): void
     {
-        $this->authorize('update', new Article);
+        $this->authorize('create', Article::class);
 
         $this->filteredQuery()->whereNull('read_at')->update(['read_at' => now()]);
     }
@@ -96,30 +96,40 @@ class Library extends Component
     {
         $this->authorize('viewAny', Article::class);
 
-        $statusCounts = Article::toBase()
+        $statusCounts = $this->mine()->toBase()
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
         return view('livewire.library', [
             'articles' => $this->filteredQuery()->paginate(self::PER_PAGE),
-            'pipeline' => Article::whereIn('status', [ArticleStatus::Queued, ArticleStatus::Fetching, ArticleStatus::Failed])
+            'pipeline' => $this->mine()->whereIn('status', [ArticleStatus::Queued, ArticleStatus::Fetching, ArticleStatus::Failed])
                 ->oldest()
                 ->limit(6)
                 ->get(),
             'tabCounts' => [
-                'all' => Article::count(),
-                'unread' => Article::unread()->count(),
-                'archived' => Article::archived()->count(),
+                'all' => $this->mine()->count(),
+                'unread' => $this->mine()->unread()->count(),
+                'archived' => $this->mine()->archived()->count(),
             ],
             'statusCounts' => $statusCounts,
         ]);
     }
 
+    /**
+     * Everyone's library is their own, admin included (sandboxes never mix in).
+     *
+     * @return Builder<Article>
+     */
+    private function mine(): Builder
+    {
+        return Article::query()->whereBelongsTo(auth()->user());
+    }
+
     /** @return Builder<Article> */
     private function filteredQuery()
     {
-        $query = Article::query()->withCount('highlights');
+        $query = $this->mine()->withCount('highlights');
 
         match ($this->tab) {
             'unread' => $query->unread(),

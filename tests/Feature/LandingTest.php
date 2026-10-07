@@ -27,23 +27,11 @@ it('links to a public collection but never a private one', function () {
     $this->get('/')->assertSee('/c/reading-list');
 });
 
-it('signs visitors in as the read-only demo user', function () {
-    $demo = demoUser();
-    User::factory()->create()->assignRole(Role::findOrCreate('admin'));
-
-    $this->post('/demo')->assertRedirect(route('library'));
-
-    $this->assertAuthenticatedAs($demo);
-});
-
-it('is unavailable when disabled or when there is no demo user', function () {
-    $this->post('/demo')->assertNotFound();
-
-    demoUser();
+it('hides the demo button when the demo is disabled', function () {
     config(['stash.demo_login' => false]);
-    $this->post('/demo')->assertNotFound();
-    $this->get('/')->assertDontSee('Try the demo');
 
+    $this->get('/')->assertDontSee('Try the demo');
+    $this->post('/demo')->assertNotFound();
     $this->assertGuest();
 });
 
