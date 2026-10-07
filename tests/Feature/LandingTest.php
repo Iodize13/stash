@@ -16,7 +16,9 @@ it('explains the app to guests and offers the demo', function () {
         ->assertOk()
         ->assertSee('Try the demo')
         ->assertSee('// HOW IT WORKS')
-        ->assertSee('SSRF-SAFE FETCHING');
+        ->assertSee('SSRF-SAFE FETCHING')
+        ->assertSee('ISOLATED SANDBOXES')
+        ->assertDontSee('read-only');
 });
 
 it('links to a public collection but never a private one', function () {

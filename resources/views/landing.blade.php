@@ -96,8 +96,8 @@
                 <p class="font-sans text-sm leading-relaxed text-muted">Rate limits and server errors retry with backoff; permanent failures are reported with a reason and can be retried from the UI or admin panel.</p>
             </div>
             <div class="flex flex-col gap-2 bg-panel p-5">
-                <p class="flex items-center gap-2 text-xs text-accent"><x-material-icon name="lock" class="text-[16px]" /> POLICY-ENFORCED ROLES</p>
-                <p class="font-sans text-sm leading-relaxed text-muted">The demo role is read-only through policies, not hidden buttons, so direct requests are refused too, and tests cover each write path.</p>
+                <p class="flex items-center gap-2 text-xs text-accent"><x-material-icon name="lock" class="text-[16px]" /> ISOLATED SANDBOXES</p>
+                <p class="font-sans text-sm leading-relaxed text-muted">Every demo visitor gets a private account. Queries are scoped to the owner and policies check ownership, so even a direct request for someone else's article is refused; expired sandboxes are pruned on a schedule.</p>
             </div>
         </section>
 

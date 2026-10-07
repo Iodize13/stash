@@ -51,7 +51,7 @@
     @else
         <p class="flex items-center gap-2 bg-panel p-4 text-xs text-muted">
             <x-material-icon name="lock" class="text-[16px] text-hot" />
-            The demo account is read-only and cannot create tokens.
+            Only the owner account can create API tokens.
         </p>
     @endif
 

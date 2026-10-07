@@ -166,7 +166,7 @@ describe('/settings/tokens', function () {
     it('does not let the demo account create tokens', function () {
         $demo = apiUser('demo');
 
-        $this->actingAs($demo)->get('/settings/tokens')->assertOk()->assertSee('cannot create tokens');
+        $this->actingAs($demo)->get('/settings/tokens')->assertOk()->assertSee('Only the owner account can create API tokens.');
 
         Livewire::actingAs($demo)->test(ApiTokens::class)
             ->set('name', 'x')
