@@ -57,4 +57,4 @@ The app is served at <http://localhost:8080> (`APP_PORT`; rootless Docker cannot
 
 ## Deploying
 
-See [docs/deploy.md](docs/deploy.md) for Laravel Cloud settings: environment variables, Bun build commands, the queue worker and creating the first accounts.
+Production runs on a k3s cluster on Hetzner behind a Cloudflare Tunnel. CI builds the image (`ghcr.io/iodize13/stash`) after the tests pass; web, queue worker and scheduler run from it, with Postgres on CloudNativePG. See [docs/deploy.md](docs/deploy.md) for the image, the Kubernetes resources, the first deploy and releasing a new version.
