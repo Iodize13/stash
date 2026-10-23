@@ -99,6 +99,7 @@ jobs:
         with:
           context: .
           push: true
+          pull: true
           tags: |
             ghcr.io/iodize13/stash:latest
             ghcr.io/iodize13/stash:${{ github.sha }}
